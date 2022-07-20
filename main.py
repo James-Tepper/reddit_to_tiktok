@@ -66,7 +66,7 @@ while BREAKER:
             BREAKER = False
             break
 
-
+#Number of searches API will make
 while True:
     limit_amount = int(input("How many posts would you like to search? (MUST BE BETWEEN 15 - 10000): "))
     if 15 <= limit_amount <= 10000:
@@ -110,5 +110,3 @@ if chosen_subreddit == "Stocks" or "Wallstreetbets":
     for stock in sorting_stocks:
         print(stock , sorting_stocks[stock])
 
-
-#response = requests.get(f"https://www.reddit.com/r/wallstreetbets/")
