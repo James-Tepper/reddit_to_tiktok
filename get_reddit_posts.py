@@ -3,30 +3,24 @@ import praw
 import requests
 import time
 import settings
-from text_to_speech import read_aloud_and_print
+from text_to_speech import get_audio
 from validator_collection import validators, checkers
-
+import random
 
 __author__ = "James Tepper <jamesatepper@gmail.com>"
 __github__ = "https://github.com/James-Tepper"
 
-
+used_comments = {}
 
 def get_subreddit_name():
-    # TODO: use https://www.reddit.com/subreddits/popular.json perhaps?
-
-    subreddits = ("Jokes" , "Showerthoughts", "Confessions", "Pettyrevenge", "Prorevenge")
-
-    while True:
-        print(subreddits)
-        chosen_subreddit = input(f"Pick one of the {len(subreddits)} subreddits and create your Tiktok:\n").title()
-
-        if not chosen_subreddit in subreddits:
-            print("INVALID INPUT")
-            continue
-
-        return chosen_subreddit
-
+    '''
+    Gets a random subreddit name from a list of subreddits
+    '''
+    subreddits = ("Jokes", "Showerthoughts", "TellMeAFact", "TIFU", "TodayILearned")
+    
+    chosen_subreddit = subreddits[random.randint(0, len(subreddits) - 1)]
+    
+    return chosen_subreddit
 
 
 def find_and_read_post(reddit, chosen_subreddit):
@@ -38,20 +32,22 @@ def find_and_read_post(reddit, chosen_subreddit):
     subreddit = reddit.subreddit(chosen_subreddit)
     hot_posts = subreddit.hot(limit=10)
 
-    for posts in hot_posts:
-        if not posts.stickied:
-            post_title = posts.title
-            post_body = posts.selftext
+    for post in hot_posts:
+        if not post.stickied and not post.over_18:
+        # and not post in used_posts
+            #TODO RECORD
+            get_audio(post.id, post.title, format="title")
+            get_audio(post.id, post.selftext, format="post")
 
-            if 60 <= len(post_body.split()) <= 260:
-                read_aloud_and_print(post_title, post_body)
-                audio_and_text_post = read_aloud_and_print(post_title, post_body)
-            else:
-                print("Submission is invalid")
+            return get_content_from_post(post)
 
-    return audio_and_text_post
-
-
+def get_content_from_post(post):
+    for amount, comment in enumerate(post.comments):
+        if len(comment.body.split()) > 100:
+            print("comment.body" + comment.body)
+            get_audio(comment.id, comment.body, format="comment")
+            if amount > 5:
+                break
 
 def main():
     reddit = praw.Reddit(client_id=settings.CLIENT_ID,
@@ -65,5 +61,5 @@ def main():
 
 
 
-if __name__ == "__main__": # https://www.youtube.com/watch?v=g_wlZ9IhbTs
+if __name__ == "__main__":
     main()
