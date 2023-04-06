@@ -3,6 +3,7 @@ import praw
 import requests
 import time
 import settings
+import shutil
 from text_to_speech import get_audio
 from validator_collection import validators, checkers
 import random
@@ -10,7 +11,10 @@ import random
 __author__ = "James Tepper <jamesatepper@gmail.com>"
 __github__ = "https://github.com/James-Tepper"
 
-used_comments = {}
+VOICEOVERS_PATH = f"/mnt/c/Users/James/OneDrive/Desktop/Voiceovers/"
+
+USED_POSTS = {}
+USED_COMMENTS = {}
 
 def get_subreddit_name():
     '''
@@ -36,18 +40,22 @@ def find_and_read_post(reddit, chosen_subreddit):
         if not post.stickied and not post.over_18:
         # and not post in used_posts
             #TODO RECORD
-            get_audio(post.id, post.title, format="title")
-            get_audio(post.id, post.selftext, format="post")
+            title_audio = get_audio(post.id, post.title, format="title")
+            post_audio = get_audio(post.id, post.selftext, format="post")
+            
+            shutil.copy(title_audio, VOICEOVERS_PATH)
+            shutil.copy(post_audio, VOICEOVERS_PATH)
 
-            return get_content_from_post(post)
+            get_comments_from_post(post)
 
-def get_content_from_post(post):
+def get_comments_from_post(post):
     for amount, comment in enumerate(post.comments):
-        if len(comment.body.split()) > 100:
-            print("comment.body" + comment.body)
-            get_audio(comment.id, comment.body, format="comment")
+        if len(comment.body.split()) < 100:
+            comment_audio = get_audio(comment.id, comment.body, format="comment")
+            shutil.copy(comment_audio, VOICEOVERS_PATH)
+            
             if amount > 5:
-                break
+                return
 
 def main():
     reddit = praw.Reddit(client_id=settings.CLIENT_ID,
