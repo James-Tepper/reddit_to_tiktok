@@ -11,7 +11,7 @@ import random
 __author__ = "James Tepper <jamesatepper@gmail.com>"
 __github__ = "https://github.com/James-Tepper"
 
-VOICEOVERS_PATH = f"/mnt/c/Users/James/OneDrive/Desktop/Voiceovers/"
+VOICEOVERS_PATH = "./audio_files"
 
 USED_POSTS = {}
 USED_COMMENTS = {}
